@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria Histórica - Botafogo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #050505;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background-color: #151515;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #333; 
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+            text-align: center;
+            width: 95%;
+            max-width: 900px;
+            height: 95vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .bfr-logo {
+            width: 35px;
+            height: 42px;
+            margin: 0 auto;
+            filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));
+        }
+
+        h1 { 
+            font-size: 1.2rem;
+            margin: 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ddd;
+        }
+
+        #start-screen, #game-interface {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+        }
+        #game-interface { display: none; }
+
+        .btn-start {
+            margin: auto;
+            padding: 20px 60px;
+            font-size: 24px;
+            background-color: #fff;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+        .btn-start:hover { transform: scale(1.05); }
+
+        /* TIMER VISUAL */
+        .timer-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto;
+            flex-shrink: 0;
+        }
+        .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .circle-bg { fill: none; stroke: #333; stroke-width: 4; }
+        .circle-progress {
+            fill: none;
+            stroke: #fff;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 175;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear;
+        }
+        .timer-number {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: bold; color: white;
+        }
+
+        /* IMAGEM */
+        .image-box {
+            flex: 2;
+            background-color: #000;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            border: 1px solid #222;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            image-rendering: high-quality;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+        }
+
+        #answer-display {
+            min-height: 50px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff; 
+            text-transform: uppercase;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #222;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .btn-action {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+            flex-shrink: 0;
+        }
+
+        .btn-reveal { background-color: #333; color: white; border: 1px solid #fff; }
+        .btn-reveal:hover { background-color: #555; }
+        .btn-next { background-color: #fff; color: black; border: 2px solid #000; display: none; }
+        .btn-next:hover { background-color: #ccc; }
+
+        .info-text { color: #555; font-size: 0.8rem; margin-top: 5px; flex-shrink: 0; }
+        
+        .header-game {
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 10px 10px 0 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="start-screen">
+            <div style="margin-top: 50px;">
+                <svg class="bfr-logo" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" style="width: 80px; height: 96px;">
+                    <path d="M50 5 C20 5 5 15 5 40 V60 C5 90 50 115 50 115 C50 115 95 90 95 60 V40 C95 15 80 5 50 5 Z" fill="black" stroke="white" stroke-width="3"/>
+                    <polygon points="50,25 58,48 83,48 63,63 70,86 50,73 30,86 37,63 17,48 42,48" fill="white"/>
+                </svg>
+                <h1 style="font-size: 2rem; margin-top: 20px;">Quiz do Glorioso</h1>
+            </div>
+            <button class="btn-start" onclick="startGame()">INICIAR</button>
+            <div style="margin-bottom: 20px; color: #444; font-size: 1rem;">Prepare-se para o desafio</div>
+        </div>
+
+        <div id="game-interface">
+            
+            <div class="header-game">
+                <svg class="bfr-logo" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 5 C20 5 5 15 5 40 V60 C5 90 50 115 50 115 C50 115 95 90 95 60 V40 C95 15 80 5 50 5 Z" fill="black" stroke="white" stroke-width="3"/>
+                    <polygon points="50,25 58,48 83,48 63,63 70,86 50,73 30,86 37,63 17,48 42,48" fill="white"/>
+                </svg>
+
+                <div class="timer-container">
+                    <svg class="timer-svg" viewBox="0 0 60 60">
+                        <circle class="circle-bg" cx="30" cy="30" r="28"></circle>
+                        <circle id="progress-ring" class="circle-progress" cx="30" cy="30" r="28"></circle>
+                    </svg>
+                    <div id="timer-text" class="timer-number">25</div>
+                </div>
+                
+                <div style="width: 35px;"></div>
+            </div>
+
+            <div class="image-box">
+                <img id="game-image" src="" alt="Imagem do Jogo">
+            </div>
+
+            <div id="answer-display">???</div>
+
+            <button id="btn-reveal" class="btn-action btn-reveal" onclick="forceReveal()">Revelar</button>
+            <button id="btn-next" class="btn-action btn-next" onclick="nextLevel()">Próxima</button>
+            
+            <div class="info-text">
+                <span id="current-count">1</span> / <span id="total-count">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- LISTA DE 15 IMAGENS ---
+        const imageList = [
+            "Botafogo 2 x 0 America 2023 Brasileirão.webp",
+            "Botafogo 2 x 0 Fluminense Brasileirão 2023.webp",
+            "Botafogo 2 x 1 Flamengo final carioca 2010.jpg",
+            "Botafogo 1 x 0 Corinthians 2019 Brasileirão.webp",
+            "Botafogo 3 x 2 São Paulo Brasileirão 2009.webp",
+            "Botafogo 4 x 0 Deportivo Quito.webp",
+            "Botafogo 3 x 0 Criciuma Brasileirão 2013.webp",
+            "Botafogo 3 x 0 Ceilândia copa do brasil 2022.webp",
+            "Botafogo 1 x 0 Vasco Brasileirão 2019.jpg",
+            "Botafogo 3 x 2 Internacional Brasileirão 2022.webp",
+            "Botafogo 2 x 0 Nacional - Oitavas de final libertadores 2017.webp",
+            "Botafogo 3 x 1 Cruzeiro Brasileirão 2012.webp",
+            "Botafogo 3 x 0 Atletico MG Brasileirão 2024.jpg",
+            "Botafogo 3 x 5 Portuguesa Campeonato carioca 2022.jpg",
+            "Botafogo 1 x 3 Palmeiras Brasileirão 2022.webp"
+        ];
+
+        let currentIndex = 0;
+        let timeLeft = 25;
+        let timerInterval;
+        const TOTAL_TIME = 25;
+        const CIRCUMFERENCE = 175; 
+
+        const startScreen = document.getElementById('start-screen');
+        const gameInterface = document.getElementById('game-interface');
+        const imgEl = document.getElementById('game-image');
+        const answerEl = document.getElementById('answer-display');
+        const timerTextEl = document.getElementById('timer-text');
+        const progressRing = document.getElementById('progress-ring');
+        const btnReveal = document.getElementById('btn-reveal');
+        const btnNext = document.getElementById('btn-next');
+        const currentCountEl = document.getElementById('current-count');
+        const totalCountEl = document.getElementById('total-count');
+
+        document.getElementById('total-count').innerText = imageList.length;
+
+        function startGame() {
+            if (imageList.length === 0) {
+                alert("A lista de imagens está vazia! Adicione os arquivos no código.");
+                return;
+            }
+            startScreen.style.display = 'none';
+            gameInterface.style.display = 'flex';
+            loadLevel();
+        }
+
+        function getCleanName(filename) {
+            let name = filename.split('.').slice(0, -1).join('.');
+            return name.replace(/[_-]/g, ' ');
+        }
+
+        function setProgress(percent) {
+            const offset = CIRCUMFERENCE - (percent / 100) * CIRCUMFERENCE;
+            progressRing.style.strokeDashoffset = offset;
+        }
+
+        function startTimer() {
+            timeLeft = TOTAL_TIME;
+            updateTimerVisuals();
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerVisuals();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    revealAnswer();
+                }
+            }, 1000);
+        }
+
+        function updateTimerVisuals() {
+            timerTextEl.innerText = timeLeft;
+            const percentageLeft = (timeLeft / TOTAL_TIME) * 100;
+            setProgress(100 - percentageLeft); 
+
+            if (timeLeft <= 5) {
+                progressRing.style.stroke = "#f00";
+                timerTextEl.style.color = "#f00";
+            } else {
+                progressRing.style.stroke = "#fff";
+                timerTextEl.style.color = "#fff";
+            }
+        }
+
+        function forceReveal() {
+            clearInterval(timerInterval);
+            revealAnswer();
+        }
+
+        function revealAnswer() {
+            const cleanName = getCleanName(imageList[currentIndex]);
+            answerEl.innerText = cleanName;
+            answerEl.style.backgroundColor = "#fff";
+            answerEl.style.color = "#000";
+            answerEl.style.border = "2px solid #fff";
+            btnReveal.style.display = 'none';
+            btnNext.style.display = 'block';
+            
+            setProgress(100);
+            timerTextEl.innerText = "0";
+        }
+
+        function loadLevel() {
+            if (currentIndex < imageList.length) {
+                answerEl.innerText = "???"; 
+                answerEl.style.backgroundColor = "#222";
+                answerEl.style.color = "#fff";
+                answerEl.style.border = "1px solid #444";
+                
+                progressRing.style.strokeDashoffset = 0;
+                progressRing.style.stroke = "#fff";
+                timerTextEl.style.color = "#fff";
+                
+                btnReveal.style.display = 'block';
+                btnNext.style.display = 'none';
+
+                currentCountEl.innerText = currentIndex + 1;
+                imgEl.src = imageList[currentIndex];
+                
+                startTimer();
+            } else {
+                finishGame();
+            }
+        }
+
+        function nextLevel() {
+            currentIndex++;
+            loadLevel();
+        }
+
+        function finishGame() {
+            clearInterval(timerInterval);
+            const logoSVG = document.querySelector('.bfr-logo').outerHTML;
+            document.querySelector('.container').innerHTML = `
+                ${logoSVG}
+                <h1 style="margin-top:20px; font-size: 2rem;">Fim de Jogo!</h1>
+                <p>Todas as imagens foram exibidas.</p>
+                <div style="flex:1"></div>
+                <button class="btn-start" onclick="location.reload()">Jogar Novamente</button>
+                <div style="flex:1"></div>
+            `;
+        }
+    </script>
+</body>
+</html>
